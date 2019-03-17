@@ -54,7 +54,7 @@ app.get('/testresults/:package/', (req, res) => {
  *  @query-string secondsAgo - filter results by timestamp recency
  */
 app.get('/testresults/:package/:id', (req, res) => {
-    let data = db.responses.find({package: req.params.package, id: parseInt(req.params.id)});
+    let data = db.responses.find({package: req.params.package, id: req.params.id});
 
     //Filter by secondsAgo if defined
     if(req.query.secondsAgo) {
