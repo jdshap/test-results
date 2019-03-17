@@ -1,9 +1,18 @@
 const express = require('express');
+const router = express.Router();
 const db = require('diskdb');
 const fs = require('fs');
 
+
+const configTemplate = `{
+    "contextPath": "",
+    "port": ""
+}`;
+if(!fs.existsSync('./config.json')) fs.writeFile('config.json', configTemplate, 'utf8', (err) => { if (err) throw err });
+const config = require('./config');
+
 const app = express();
-app.use(express.json());
+router.use(express.json());
 
 // Connect to diskdb database "responses"
 db.connect('db', ['responses']);
@@ -12,7 +21,7 @@ db.connect('db', ['responses']);
  *  GET method
  *  @query-string secondsAgo - filter results by timestamp recency
  */
-app.get('/testresults', (req, res) => {
+router.get('/testresults', (req, res) => {
     let data = db.responses.find();
 
     //Filter by secondsAgo if defined
@@ -32,7 +41,7 @@ app.get('/testresults', (req, res) => {
  *  @route-parameter package - filters by specified package value
  *  @query-string secondsAgo - filter results by timestamp recency
  */
-app.get('/testresults/:package/', (req, res) => {
+router.get('/testresults/:package/', (req, res) => {
     let data = db.responses.find({package: req.params.package});
 
     //Filter by secondsAgo if defined
@@ -53,7 +62,7 @@ app.get('/testresults/:package/', (req, res) => {
  *  @route-parameter id - filters by specified id value (Not database _id hash)
  *  @query-string secondsAgo - filter results by timestamp recency
  */
-app.get('/testresults/:package/:id', (req, res) => {
+router.get('/testresults/:package/:id', (req, res) => {
     let data = db.responses.find({package: req.params.package, id: req.params.id});
 
     //Filter by secondsAgo if defined
@@ -71,7 +80,7 @@ app.get('/testresults/:package/:id', (req, res) => {
 /*
  *  POST method
  */
-app.post('/testresults', (req, res) => {
+router.post('/testresults', (req, res) => {
     let result = {
         package: req.body.package,
         id: req.body.id,
@@ -88,7 +97,7 @@ app.post('/testresults', (req, res) => {
  *  DELETE method
  *  Backs up database, then clears it.
  */
-app.delete('/testresults', (req, res) => {
+router.delete('/testresults', (req, res) => {
     const json = JSON.stringify(db.responses.find());
     fs.writeFile(`db/backup-${Date.now()}`, json, 'utf8', (err) => { if (err) throw err });
     db.responses.remove();
@@ -96,5 +105,8 @@ app.delete('/testresults', (req, res) => {
     res.send('DELETE complete');
 });
 
-const port = process.env.PORT || 3000;
+const contextPath = config.contextPath || "/";
+const port = config.port || 3000;
+
+app.use(contextPath, router);
 app.listen(port, () => console.log(`Listening on port ${port}...`));
