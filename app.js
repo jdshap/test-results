@@ -86,7 +86,7 @@ router.post('/testresults', (req, res) => {
         id: req.body.id,
         numPass: req.body.numPass,
         numFail: req.body.numFail,
-        elapsedTime: req.body.elapsedTime,
+        elapsedTime: parseInt(req.body.elapsedTime),
         timestamp: Date.now()
     };
     db.responses.save(result);
@@ -109,4 +109,5 @@ const contextPath = config.contextPath || "/";
 const port = config.port || 3000;
 
 app.use(contextPath, router);
-app.listen(port, () => console.log(`Listening on port ${port}...`));
+const server = app.listen(port, () => console.log(`Listening on port ${port}...`));
+module.exports = {server, contextPath};
