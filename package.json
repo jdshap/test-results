@@ -1,17 +1,18 @@
 {
   "name": "test-results",
   "version": "1.0.0",
-  "description": "",
+  "description": "A RESTful API designed to store the results of unit tests",
   "main": "app.js",
   "scripts": {
     "test": "mocha --exit",
-    "start": "node app.js"
+    "start": "node bootstrapper.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "diskdb": "^0.1.17",
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "yargs": "^13.2.2"
   },
   "devDependencies": {
     "chai": "^4.2.0",
